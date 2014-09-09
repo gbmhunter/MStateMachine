@@ -38,8 +38,7 @@ namespace MbeddedNinja
 
 // System headers
 #include <cstdint>		// int8_t, int32_t e.t.c
-#include <vector>
-#include <iostream>
+//#include <iostream>
 #include <cstring>
 
 // User libraries
