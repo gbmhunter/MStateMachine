@@ -97,12 +97,16 @@ namespace MbeddedNinja
 			//! @brief		Remebers the total number of states registered with this state machine.
 			uint32_t numOfStates;
 
+			//! @brief		Set to true from within a state to return from StateMachine::Run().
+			bool quitStateMachine;
+
 			//! @brief		Remebers what is the current state. Modified from
 			//!				Transitions by calling TransToState().
 			uint32_t currStateNum;
 
 			StateMachine() :
 				numOfStates(0),
+				quitStateMachine(false),
 				currStateNum(0)
 			{
 
@@ -150,7 +154,7 @@ namespace MbeddedNinja
 			//!				state and the returned state code.
 			virtual void Transitions(uint32_t returnCode) = 0;
 
-			//! @warning	Will not return!
+			//! @warning	Will not return unless quitStateMachine is set to true.
 			void Run()
 			{
 
@@ -160,6 +164,11 @@ namespace MbeddedNinja
 					uint32_t returnCode = this->states[this->currStateNum]->Run();
 					// This should modify currStateNum
 					this->Transitions(returnCode);
+
+					// See if quitStateMachine has been set to true, and if so,
+					// return from Run()
+					if(this->quitStateMachine)
+						return;
 				}
 			}
 		};

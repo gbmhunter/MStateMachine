@@ -1,7 +1,7 @@
 //!
-//! @file 			BasicTests.cpp
+//! @file 			QuitStateMachineFromStateTests.cpp
 //! @author 		Geoffrey Hunter <gbmhunter@gmail.com> (www.mbedded.ninja)
-//! @created		2014-09-08
+//! @created		2014-09-09
 //! @last-modified 	2014-09-09
 //! @brief 			Contains basic tests.
 //! @details
@@ -23,11 +23,11 @@ using namespace MbeddedNinja;
 namespace MStateMachineTestsNs
 {
 
-	class TestSm : public MStateMachineNs::StateMachine
+	class QuitFromStateSm : public MStateMachineNs::StateMachine
 	{
 
 	public:
-		TestSm()
+		QuitFromStateSm()
 			: StateMachine()
 		{}
 
@@ -76,9 +76,17 @@ namespace MStateMachineTestsNs
 		}
 	};
 
-	void TestSm::Transitions(uint32_t returnCode)
+	void QuitFromStateSm::Transitions(uint32_t returnCode)
 	{
 		sleep(1);
+
+		static uint32_t callCounter = 0;
+		callCounter++;
+		if(callCounter == 6)
+		{
+			// Lets quit the state machine
+			this->quitStateMachine = true;
+		}
 
 		std::cout << "currStateNum = '" << this->currStateNum << "'." << std::endl;
 		//std::cout << "CurrState UniqueId = '" << this->states[currStateNum]->GetId() << "'." << std::endl;
@@ -111,24 +119,18 @@ namespace MStateMachineTestsNs
 
 	}
 
-	MTEST(BasicTest)
+	MTEST(QuitStateMachineFromStateTest)
 	{
 		StAwake stAwake("StAwake");
 		StSleeping stSleeping("StSleeping");
-		TestSm satModemSm;
-		satModemSm.AddState(&stAwake);
-		satModemSm.AddState(&stSleeping);
-		std::cout << "Num states = '" << satModemSm.numOfStates << "'." << std::endl;
+		QuitFromStateSm quitFromStateSm;
+		quitFromStateSm.AddState(&stAwake);
+		quitFromStateSm.AddState(&stSleeping);
+		//std::cout << "Num states = '" << satModemSm.numOfStates << "'." << std::endl;
 		std::cout << "Running state machine..." << std::endl;
-		satModemSm.Run();
+		quitFromStateSm.Run();
 		std::cout << "State machine returned!" << std::endl;
 		CHECK(true);
-	}
-
-	MTEST(BasicCheckEqualTest)
-	{
-		// Check capacity is calculated correctly
-		CHECK_EQUAL("Testing", "Testing");
 	}
 
 } // namespace MUnitTestTestsNs

@@ -12,7 +12,7 @@ A microcontroller-friendly C++ state machine framework specifically designed for
 - Author: gbmhunter <gbmhunter@gmail.com> (www.mbedded.ninja)
 - First Ever Commit: 2014-09-08
 - Last Modified: 2014-09-09
-- Version: v1.1.2.0
+- Version: v1.2.0.0
 - Company: mbedded.ninja
 - Project: MToolkit
 - Language: C++
@@ -49,7 +49,13 @@ Basic Workflow
 
 
 To be compatible with mid-range microcontrollers, no exceptions are used, and the entire framework has a no-throw guarantee.
+
+Exiting Statemachine
+---------------------
 	
+Normally, :code:`StateMachine::Run()` will run forever, and you won't need to return from this function (this is the default behaviour). However, in the case that you do, you can set the variable :code:`StateMachine::exitFromStateMachine` to :code:`true` to cause the state machine to return to the calling function.
+
+Look at the example in :code:`test/QuitStateMachineFromStateTests.cpp` for more information/help regarding this topic.
 
 External Dependencies
 =====================
@@ -82,6 +88,7 @@ Changelog
 ========= ========== ====================================================================================
 Version   Date       Comment
 ========= ========== ====================================================================================
+v1.2.0.0  2014-09-09 Added way to exit state machine from within a state, and added info about it to the README, closes #6.
 v1.1.2.1  2014-09-09 Added more to the description part of the README.
 v1.1.2.0  2014-09-09 Removed inclusion of <vector> and <iostream> from 'MStateMachine.hpp', closes #4.
 v1.1.1.0  2014-09-09 Changed 'State::HandlerFunc()' name to 'State::Run()', closes #3.
