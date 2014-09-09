@@ -23,8 +23,8 @@ EXAMPLE_OBJ_FILES := $(patsubst %.cpp,%.o,$(wildcard example/*.cpp))
 EXAMPLE_LD_FLAGS := 
 EXAMPLE_CC_FLAGS := -Wall -g -c -I. -I./lib -std=gnu++11
 
-DEP_LIB_PATHS := -L ../MUnitTestCpp
-DEP_LIBS := -l MUnitTest
+DEP_LIB_PATHS := -L ../MUnitTestCpp -L ../MStringCpp
+DEP_LIBS := -l MUnitTest -l String
 DEP_INCLUDE_PATHS := -I ../
 
 .PHONY: depend clean
@@ -56,7 +56,7 @@ src/%.o: src/%.cpp
 # ======== TEST ========
 	
 # Compiles unit test code
-test : $(TEST_OBJ_FILES) | mainModule
+test : $(TEST_OBJ_FILES) | mainModule deps
 	# Compiling unit test code
 	g++ $(TEST_LD_FLAGS) -o ./test/Tests.elf $(TEST_OBJ_FILES) -L./ -lMainModule $(DEP_LIB_PATHS) $(DEP_LIBS)
 
@@ -70,6 +70,9 @@ test/%.o: test/%.cpp
 		rm -f $*.d >/dev/null 2>&1
 
 -include $(TEST_OBJ_FILES:.o=.d)
+
+deps :
+	$(MAKE) -C ../MStringCpp/ all
 	
 	
 	

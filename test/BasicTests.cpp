@@ -2,7 +2,7 @@
 //! @file 			BasicTests.cpp
 //! @author 		Geoffrey Hunter <gbmhunter@gmail.com> (www.mbedded.ninja)
 //! @created		2014-09-08
-//! @last-modified 	2014-09-08
+//! @last-modified 	2014-09-09
 //! @brief 			Contains basic tests.
 //! @details
 //!					See README.rst in root dir for more info.
@@ -10,6 +10,7 @@
 // System includes
 #include <iostream>
 #include <unistd.h>
+#include <cstring>
 
 // User libraries
 #include "MUnitTestCpp/api/MUnitTestApi.hpp"
@@ -22,117 +23,113 @@ using namespace MbeddedNinja;
 namespace MStateMachineTestsNs
 {
 
-	class MyData
-	{
-	public:
-		void Print(const char * msg)
-		{
-			std::cout << msg;
-
-		}
-
-	};
-
-	class SatModemSm : public MStateMachineNs::StateMachine< MyData >
+	class TestSm : public MStateMachineNs::StateMachine
 	{
 
 	public:
-		SatModemSm(MyData * satModem)
-			: StateMachine(satModem)
+		TestSm()
+			: StateMachine()
 		{}
 
-		void Transition(uint32_t currentIndex);
+		void Transitions(uint32_t returnCode);
 	};
 
-	CREATE_STATE(StPinging2, MyData)
+	class StAwake : public MStateMachineNs::State
 	{
-		DEFINE_RETURN_CODES()
+		public:
+
+		StAwake(const char * uniqueId)	:
+			State(uniqueId)
+		{}
+
+		enum ReturnCodes
 		{
-			MODEM_RESPONDED,
-			MODEM_DID_NOT_RESPOND
+			AWAKE
 		};
 
-		DEFINE_HANDLER_FUNC(StPinging2, MyData)
+		uint32_t HandlerFunc()
 		{
-			this->stateMachine->parent->Print("StPinging handler called!");
-			// Do stuff here, then return code
-			RETURN_CODE(MODEM_RESPONDED);
-			//this->returnCode = MODEM
-			//this->returnCode = StPinging2ReturnCodes::MODEM_RESPONDED;
+			std::cout << "StAwake::HandlerFunc() called." << std::endl;
+			return AWAKE;
 		}
-
 	};
 
-	CREATE_STATE(StSleeping2, MyData)
+	class StSleeping : public MStateMachineNs::State
 	{
-		DEFINE_RETURN_CODES()
+	public:
+		StSleeping(const char * uniqueId)	:
+			State(uniqueId)
+		{}
+
+		enum ReturnCodes
 		{
-			MODEM_SLEPT
+			SLEPT
 		};
 
-		DEFINE_HANDLER_FUNC(StSleeping2, MyData)
-		{
-			this->stateMachine->parent->Print("StSleeping handler called!");
-			// Do stuff here, then return code
-			RETURN_CODE(MODEM_SLEPT);
-		}
+		static uint32_t uniqueId;
 
+
+		uint32_t HandlerFunc()
+		{
+			std::cout << "StSleeping::HandlerFunc() called." << std::endl;
+			return SLEPT;
+		}
 	};
 
-	void SatModemSm::Transition(uint32_t currIndex)
+	void TestSm::Transitions(uint32_t returnCode)
+	{
+		sleep(1);
+
+		std::cout << "currStateNum = '" << this->currStateNum << "'." << std::endl;
+		//std::cout << "CurrState UniqueId = '" << this->states[currStateNum]->GetId() << "'." << std::endl;
+		//std::cout << "StAwake UniqueId = '" << StAwake::uniqueId << "'." << std::endl;
+		//std::cout << "StSleeping UniqueId = '" << StSleeping::uniqueId << "'." << std::endl;
+		//std::cout << "this->states[0]->uniqueId = '" << this->states[0]->GetId() << "'." << std::endl;
+		//std::cout << "this->states[1]->uniqueId = '" << this->states[1]->GetId() << "'." << std::endl;
+
+		MString temp = this->CurrStateId();
+		std::cout << "temp = '" << temp.cStr << "'." << std::endl;
+		//std::cout << "strcmp = '" << strcmp(temp.cStr, "StAwake") << "'." << std::endl;
+		std::cout << "strcmp = '" << strcmp(this->CurrStateId().cStr, "StAwake") << "'." << std::endl;
+		std::cout << "this->currStateId = '" << this->CurrStateId() << "'." << std::endl;
+		if(temp == "StAwake")
 		{
-			if(!StPinging2::GetInstance())
-				std::cout << "GetInstance() NULL!!!";
+			std::cout << "StAwake!." << std::endl;
 
-			std::cout << "Curr index = '" << currIndex << "'." << std::endl;
-			std::cout << "StPinging state index = " << (StPinging2::GetInstance())->stateIndex << std::endl;
-			std::cout << "StSleeping state index = " << (StSleeping2::GetInstance())->stateIndex << std::endl;
-			std::cout << "Return code = " << (StPinging2::GetInstance())->stateIndex << std::endl;
-
-			sleep(1);
-
-			switch(currIndex)
-			{
-				case 0:
-				{
-					std::cout << "Match found!" << std::endl;
-					HANDLE_CODE(StPinging2, MODEM_RESPONDED)
-					{
-						this->currStateNum = 1;
-					}
-					break;
-				}
-				case 1:
-				{
-					HANDLE_CODE(StSleeping2, MODEM_SLEPT)
-					{
-						this->currStateNum = 0;
-					}
-					break;
-				}
-
-			}
+			this->TransToState("StSleeping");
+			//this->currStateNum = 1;
+			return;
 
 		}
-
-		MTEST(BasicTest)
+		else if(temp == "StSleeping")
 		{
-			MyData myData;
-			SatModemSm satModemSm(&myData);
-			std::cout << "Num states = '" << satModemSm.numOfStates << "'." << std::endl;
-			StPinging2 stPinging2(&satModemSm);
-			std::cout << "Num states = '" << satModemSm.numOfStates << "'." << std::endl;
-			StSleeping2 stSleeping2(&satModemSm);
-			std::cout << "Num states = '" << satModemSm.numOfStates << "'." << std::endl;
-			std::cout << ((char *)"Running state machine...") << std::endl;
-			satModemSm.Run();
-			std::cout << ((char *)"State machine returned!") << std::endl;
+			std::cout << "StSleeping!." << std::endl;
+			this->TransToState("StAwake");
+			return;
 		}
 
-		MTEST(BasicCheckEqualTest)
-		{
-			// Check capacity is calculated correctly
-			CHECK_EQUAL("Testing", "Testing");
-		}
+	}
+
+	MTEST(BasicTest)
+	{
+		//MyData myData;
+		//std::cout << "Num states = '" << satModemSm.numOfStates << "'." << std::endl;
+		StAwake stAwake("StAwake");
+		//std::cout << "Num states = '" << satModemSm.numOfStates << "'." << std::endl;
+		StSleeping stSleeping("StSleeping");
+		TestSm satModemSm;
+		satModemSm.AddState(&stAwake);
+		satModemSm.AddState(&stSleeping);
+		std::cout << "Num states = '" << satModemSm.numOfStates << "'." << std::endl;
+		std::cout << ((char *)"Running state machine...") << std::endl;
+		satModemSm.Run();
+		std::cout << ((char *)"State machine returned!") << std::endl;
+	}
+
+	MTEST(BasicCheckEqualTest)
+	{
+		// Check capacity is calculated correctly
+		CHECK_EQUAL("Testing", "Testing");
+	}
 
 } // namespace MUnitTestTestsNs

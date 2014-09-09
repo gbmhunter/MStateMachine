@@ -11,8 +11,8 @@ A microcontroller-friendly C++ state machine framework specifically designed for
 
 - Author: gbmhunter <gbmhunter@gmail.com> (www.mbedded.ninja)
 - First Ever Commit: 2014-09-08
-- Last Modified: 2014-09-08
-- Version: v1.0.0.0
+- Last Modified: 2014-09-09
+- Version: v1.1.0.0
 - Company: mbedded.ninja
 - Project: MToolkit
 - Language: C++
@@ -62,5 +62,6 @@ Changelog
 ========= ========== ====================================================================================
 Version   Date       Comment
 ========= ========== ====================================================================================
+v1.1.0.0  2014-09-09 Swicthed to non-macro style state machine, as although it was making the syntax shorter, it was confusing things. Now using strings as the unique identifier for each state.
 v1.0.0.0  2014-09-08 Initial commit. Basic state machine and state objects working, along with a few helper macros to tidy up the interface. Basic test working (toggling between two states).
 ========= ========== ====================================================================================
