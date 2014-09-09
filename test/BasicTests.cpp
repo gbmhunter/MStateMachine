@@ -47,7 +47,7 @@ namespace MStateMachineTestsNs
 			AWAKE
 		};
 
-		uint32_t HandlerFunc()
+		uint32_t Run()
 		{
 			std::cout << "StAwake::HandlerFunc() called." << std::endl;
 			return AWAKE;
@@ -69,7 +69,7 @@ namespace MStateMachineTestsNs
 		static uint32_t uniqueId;
 
 
-		uint32_t HandlerFunc()
+		uint32_t Run()
 		{
 			std::cout << "StSleeping::HandlerFunc() called." << std::endl;
 			return SLEPT;

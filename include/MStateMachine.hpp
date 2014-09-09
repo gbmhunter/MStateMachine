@@ -60,9 +60,11 @@ namespace MbeddedNinja
 
 		public:
 
-			virtual uint32_t HandlerFunc() = 0;
+			//! @brief		The function which contains the procedural logic for this state.
+			virtual uint32_t Run() = 0;
 
 			//virtual void Transition() = 0;
+
 
 			State(const char * uniqueId)
 			{
@@ -156,7 +158,7 @@ namespace MbeddedNinja
 				while(true)
 				{
 
-					uint32_t returnCode = this->states[this->currStateNum]->HandlerFunc();
+					uint32_t returnCode = this->states[this->currStateNum]->Run();
 					// This should modify currStateNum
 					this->Transitions(returnCode);
 				}
